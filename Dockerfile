@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
 FROM node:alpine as build
+# FROM node:alpine3.15-arm64 as build
 
 WORKDIR /app
 
@@ -16,6 +17,7 @@ RUN npm run build
 
 
 FROM python:3.11-slim-bookworm as base
+# FROM python:3.10.6-slim-buster-arm64 as base
 
 ENV ENV=prod
 ENV PORT ""
@@ -42,7 +44,8 @@ ENV WHISPER_MODEL_DIR="/app/backend/data/cache/whisper/models"
 # IMPORTANT: If you change the default model (all-MiniLM-L6-v2) and vice versa, you aren't able to use RAG Chat with your previous documents loaded in the WebUI! You need to re-embed them.
 ENV RAG_EMBEDDING_MODEL="all-MiniLM-L6-v2"
 # device type for whisper tts and ebbeding models - "cpu" (default), "cuda" (nvidia gpu and CUDA required) or "mps" (apple silicon) - choosing this right can lead to better performance
-ENV RAG_EMBEDDING_MODEL_DEVICE_TYPE="cpu"
+# ENV RAG_EMBEDDING_MODEL_DEVICE_TYPE="cpu"
+ENV RAG_EMBEDDING_MODEL_DEVICE_TYPE="mps"
 ENV RAG_EMBEDDING_MODEL_DIR="/app/backend/data/cache/embedding/models"
 ENV SENTENCE_TRANSFORMERS_HOME $RAG_EMBEDDING_MODEL_DIR
 
