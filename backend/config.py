@@ -250,8 +250,10 @@ OPENAI_API_BASE_URLS = (
     OPENAI_API_BASE_URLS if OPENAI_API_BASE_URLS != "" else OPENAI_API_BASE_URL
 )
 
-OPENAI_API_BASE_URLS = [url.strip() for url in OPENAI_API_BASE_URLS.split(";")]
-
+OPENAI_API_BASE_URLS = [
+    url.strip() if url != "" else "https://api.openai.com/v1"
+    for url in OPENAI_API_BASE_URLS.split(";")
+]
 
 ####################################
 # WEBUI
@@ -288,13 +290,19 @@ DEFAULT_PROMPT_SUGGESTIONS = (
 
 
 DEFAULT_USER_ROLE = os.getenv("DEFAULT_USER_ROLE", "pending")
-USER_PERMISSIONS = {"chat": {"deletion": True}}
+
+USER_PERMISSIONS_CHAT_DELETION = (
+    os.environ.get("USER_PERMISSIONS_CHAT_DELETION", "True").lower() == "true"
+)
+
+USER_PERMISSIONS = {"chat": {"deletion": USER_PERMISSIONS_CHAT_DELETION}}
 
 
-MODEL_FILTER_ENABLED = os.environ.get("MODEL_FILTER_ENABLED", False)
+MODEL_FILTER_ENABLED = os.environ.get("MODEL_FILTER_ENABLED", "False").lower() == "true"
 MODEL_FILTER_LIST = os.environ.get("MODEL_FILTER_LIST", "")
 MODEL_FILTER_LIST = [model.strip() for model in MODEL_FILTER_LIST.split(";")]
 
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "")
 
 ####################################
 # WEBUI_VERSION

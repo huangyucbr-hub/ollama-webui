@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.114] - 2024-03-20
+
+### Added
+
+- **🔗 Webhook Integration**: Now you can subscribe to new user sign-up events via webhook. Simply navigate to the admin panel > admin settings > webhook URL.
+- **🛡️ Enhanced Model Filtering**: Alongside Ollama, OpenAI proxy model whitelisting, we've added model filtering functionality for LiteLLM proxy.
+- **🌍 Expanded Language Support**: Spanish, Catalan, and Vietnamese languages are now available, with improvements made to others.
+
+### Fixed
+
+- **🔧 Input Field Spelling**: Resolved issue with spelling mistakes in input fields.
+- **🖊️ Light Mode Styling**: Fixed styling issue with light mode in document adding.
+
+### Changed
+
+- **🔄 Language Sorting**: Languages are now sorted alphabetically by their code for improved organization.
+
+## [0.1.113] - 2024-03-18
+
+### Added
+
+- 🌍 **Localization**: You can now change the UI language in Settings > General. We support Ukrainian, German, Farsi (Persian), Traditional and Simplified Chinese and French translations. You can help us to translate the UI into your language! More info in our [CONTRIBUTION.md](https://github.com/open-webui/open-webui/blob/main/docs/CONTRIBUTING.md#-translations-and-internationalization).
+- 🎨 **System-wide Theme**: Introducing a new system-wide theme for enhanced visual experience.
+
+### Fixed
+
+- 🌑 **Dark Background on Select Fields**: Improved readability by adding a dark background to select fields, addressing issues on certain browsers/devices.
+- **Multiple OPENAI_API_BASE_URLS Issue**: Resolved issue where multiple base URLs caused conflicts when one wasn't functioning.
+- **RAG Encoding Issue**: Fixed encoding problem in RAG.
+- **npm Audit Fix**: Addressed npm audit findings.
+- **Reduced Scroll Threshold**: Improved auto-scroll experience by reducing the scroll threshold from 50px to 5px.
+
+### Changed
+
+- 🔄 **Sidebar UI Update**: Updated sidebar UI to feature a chat menu dropdown, replacing two icons for improved navigation.
+
 ## [0.1.112] - 2024-03-15
 
 ### Fixed
