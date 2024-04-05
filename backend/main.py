@@ -32,6 +32,7 @@ from utils.utils import get_admin_user
 from apps.rag.utils import rag_messages
 
 from config import (
+    CONFIG_DATA,
     WEBUI_NAME,
     ENV,
     VERSION,
@@ -49,6 +50,7 @@ logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
+
 class SPAStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope):
         try:
@@ -60,13 +62,27 @@ class SPAStaticFiles(StaticFiles):
                 raise ex
 
 
+print(
+    f"""
+  ___                    __        __   _     _   _ ___ 
+ / _ \ _ __   ___ _ __   \ \      / /__| |__ | | | |_ _|
+| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || | 
+| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || | 
+ \___/| .__/ \___|_| |_|    \_/\_/ \___|_.__/ \___/|___|
+      |_|                                               
+
+      
+v{VERSION} - building the best open-source AI user interface.      
+https://github.com/open-webui/open-webui
+"""
+)
+
 app = FastAPI(docs_url="/docs" if ENV == "dev" else None, redoc_url=None)
 
 app.state.MODEL_FILTER_ENABLED = MODEL_FILTER_ENABLED
 app.state.MODEL_FILTER_LIST = MODEL_FILTER_LIST
 
 app.state.WEBHOOK_URL = WEBHOOK_URL
-
 
 origins = ["*"]
 
@@ -88,7 +104,6 @@ class RAGMiddleware(BaseHTTPMiddleware):
             # Example: Add a new key-value pair or modify existing ones
             # data["modified"] = True  # Example modification
             if "docs" in data:
-
                 data = {**data}
                 data["messages"] = rag_messages(
                     data["docs"],
@@ -163,14 +178,22 @@ app.mount("/rag/api/v1", rag_app)
 
 @app.get("/api/config")
 async def get_app_config():
+    # Checking and Handling the Absence of 'ui' in CONFIG_DATA
 
+    default_locale = "en-US"
+    if "ui" in CONFIG_DATA:
+        default_locale = CONFIG_DATA["ui"].get("default_locale", "en-US")
+
+    # The Rest of the Function Now Uses the Variables Defined Above
     return {
         "status": True,
         "name": WEBUI_NAME,
         "version": VERSION,
+        "default_locale": default_locale,
         "images": images_app.state.ENABLED,
         "default_models": webui_app.state.DEFAULT_MODELS,
         "default_prompt_suggestions": webui_app.state.DEFAULT_PROMPT_SUGGESTIONS,
+        "trusted_header_auth": bool(webui_app.state.AUTH_TRUSTED_EMAIL_HEADER),
     }
 
 
@@ -191,7 +214,6 @@ class ModelFilterConfigForm(BaseModel):
 async def update_model_filter_config(
     form_data: ModelFilterConfigForm, user=Depends(get_admin_user)
 ):
-
     app.state.MODEL_FILTER_ENABLED = form_data.enabled
     app.state.MODEL_FILTER_LIST = form_data.models
 
@@ -200,6 +222,9 @@ async def update_model_filter_config(
 
     openai_app.state.MODEL_FILTER_ENABLED = app.state.MODEL_FILTER_ENABLED
     openai_app.state.MODEL_FILTER_LIST = app.state.MODEL_FILTER_LIST
+
+    litellm_app.state.MODEL_FILTER_ENABLED = app.state.MODEL_FILTER_ENABLED
+    litellm_app.state.MODEL_FILTER_LIST = app.state.MODEL_FILTER_LIST
 
     return {
         "enabled": app.state.MODEL_FILTER_ENABLED,
@@ -231,7 +256,6 @@ async def update_webhook_url(form_data: UrlForm, user=Depends(get_admin_user)):
 
 @app.get("/api/version")
 async def get_app_config():
-
     return {
         "version": VERSION,
     }
@@ -239,7 +263,7 @@ async def get_app_config():
 
 @app.get("/api/changelog")
 async def get_app_changelog():
-    return CHANGELOG
+    return {key: CHANGELOG[key] for idx, key in enumerate(CHANGELOG) if idx < 5}
 
 
 @app.get("/api/version/updates")
@@ -257,6 +281,20 @@ async def get_app_latest_release_version():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=ERROR_MESSAGES.RATE_LIMIT_EXCEEDED,
         )
+
+
+@app.get("/manifest.json")
+async def get_manifest_json():
+    return {
+        "name": WEBUI_NAME,
+        "short_name": WEBUI_NAME,
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#343541",
+        "theme_color": "#343541",
+        "orientation": "portrait-primary",
+        "icons": [{"src": "/favicon.png", "type": "image/png", "sizes": "844x884"}],
+    }
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

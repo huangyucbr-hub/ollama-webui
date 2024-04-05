@@ -107,7 +107,7 @@
 	bind:this={navElement}
 	class="h-screen max-h-[100dvh] min-h-screen {show
 		? 'lg:relative w-[260px]'
-		: '-translate-x-[260px] w-[0px]'} bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-200 text-sm transition z-40 fixed top-0 left-0
+		: '-translate-x-[260px] w-[0px]'} bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-200 text-sm transition fixed z-50 top-0 left-0
         "
 >
 	<div
@@ -581,7 +581,7 @@
 							<div class="py-2 w-full">
 								{#if $user.role === 'admin'}
 									<button
-										class="flex py-2.5 px-3.5 w-full dark:hover:bg-gray-800 transition"
+										class="flex py-2.5 px-3.5 w-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
 										on:click={() => {
 											goto('/admin');
 											showDropdown = false;
@@ -607,7 +607,7 @@
 									</button>
 
 									<button
-										class="flex py-2.5 px-3.5 w-full dark:hover:bg-gray-800 transition"
+										class="flex py-2.5 px-3.5 w-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
 										on:click={() => {
 											goto('/playground');
 											showDropdown = false;
@@ -634,7 +634,7 @@
 								{/if}
 
 								<button
-									class="flex py-2.5 px-3.5 w-full dark:hover:bg-gray-800 transition"
+									class="flex py-2.5 px-3.5 w-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
 									on:click={async () => {
 										await showSettings.set(true);
 										showDropdown = false;
@@ -669,7 +669,7 @@
 
 							<div class="py-2 w-full">
 								<button
-									class="flex py-2.5 px-3.5 w-full dark:hover:bg-gray-800 transition"
+									class="flex py-2.5 px-3.5 w-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
 									on:click={() => {
 										localStorage.removeItem('token');
 										location.href = '/auth';
@@ -706,7 +706,7 @@
 	</div>
 
 	<div
-		class="fixed left-0 top-[50dvh] z-40 -translate-y-1/2 transition-transform translate-x-[255px] md:translate-x-[260px] rotate-0"
+		class="fixed left-0 top-[50dvh] -translate-y-1/2 transition-transform translate-x-[255px] md:translate-x-[260px] rotate-0"
 	>
 		<Tooltip
 			placement="right"

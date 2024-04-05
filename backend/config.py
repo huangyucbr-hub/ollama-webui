@@ -25,7 +25,9 @@ try:
 except ImportError:
     log.warning("dotenv not installed, skipping...")
 
-WEBUI_NAME = "Open WebUI"
+WEBUI_NAME = os.environ.get("WEBUI_NAME", "Open WebUI")
+WEBUI_FAVICON_URL = "https://openwebui.com/favicon.png"
+
 shutil.copyfile("../build/favicon.png", "./static/favicon.png")
 
 ####################################
@@ -116,7 +118,20 @@ else:
 log = logging.getLogger(__name__)
 log.info(f"GLOBAL_LOG_LEVEL: {GLOBAL_LOG_LEVEL}")
 
-log_sources = ["AUDIO", "CONFIG", "DB", "IMAGES", "LITELLM", "MAIN", "MODELS", "OLLAMA", "OPENAI", "RAG"]
+log_sources = [
+    "AUDIO",
+    "COMFYUI",
+    "CONFIG",
+    "DB",
+    "IMAGES",
+    "LITELLM",
+    "MAIN",
+    "MODELS",
+    "OLLAMA",
+    "OPENAI",
+    "RAG",
+    "WEBHOOK",
+]
 
 SRC_LOG_LEVELS = {}
 
@@ -135,13 +150,14 @@ log.setLevel(SRC_LOG_LEVELS["CONFIG"])
 ####################################
 
 CUSTOM_NAME = os.environ.get("CUSTOM_NAME", "")
+
 if CUSTOM_NAME:
     try:
         r = requests.get(f"https://api.openwebui.com/api/v1/custom/{CUSTOM_NAME}")
         data = r.json()
         if r.ok:
             if "logo" in data:
-                url = (
+                WEBUI_FAVICON_URL = url = (
                     f"https://api.openwebui.com{data['logo']}"
                     if data["logo"][0] == "/"
                     else data["logo"]
@@ -157,7 +173,9 @@ if CUSTOM_NAME:
     except Exception as e:
         log.exception(e)
         pass
-
+else:
+    if WEBUI_NAME != "Open WebUI":
+        WEBUI_NAME += " (Open WebUI)"
 
 ####################################
 # DATA/FRONTEND BUILD DIR
@@ -238,7 +256,7 @@ OLLAMA_API_BASE_URL = os.environ.get(
 )
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "")
-
+K8S_FLAG = os.environ.get("K8S_FLAG", "")
 
 if OLLAMA_BASE_URL == "" and OLLAMA_API_BASE_URL != "":
     OLLAMA_BASE_URL = (
@@ -250,6 +268,9 @@ if OLLAMA_BASE_URL == "" and OLLAMA_API_BASE_URL != "":
 if ENV == "prod":
     if OLLAMA_BASE_URL == "/ollama":
         OLLAMA_BASE_URL = "http://host.docker.internal:11434"
+
+    elif K8S_FLAG:
+        OLLAMA_BASE_URL = "http://ollama-service.open-webui.svc.cluster.local:11434"
 
 
 OLLAMA_BASE_URLS = os.environ.get("OLLAMA_BASE_URLS", "")
@@ -345,6 +366,9 @@ WEBUI_VERSION = os.environ.get("WEBUI_VERSION", "v1.0.0-alpha.100")
 ####################################
 
 WEBUI_AUTH = True
+WEBUI_AUTH_TRUSTED_EMAIL_HEADER = os.environ.get(
+    "WEBUI_AUTH_TRUSTED_EMAIL_HEADER", None
+)
 
 ####################################
 # WEBUI_SECRET_KEY

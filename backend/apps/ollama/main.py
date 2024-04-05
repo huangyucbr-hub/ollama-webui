@@ -33,7 +33,13 @@ from constants import ERROR_MESSAGES
 from utils.utils import decode_token, get_current_user, get_admin_user
 
 
-from config import SRC_LOG_LEVELS, OLLAMA_BASE_URLS, MODEL_FILTER_ENABLED, MODEL_FILTER_LIST, UPLOAD_DIR
+from config import (
+    SRC_LOG_LEVELS,
+    OLLAMA_BASE_URLS,
+    MODEL_FILTER_ENABLED,
+    MODEL_FILTER_LIST,
+    UPLOAD_DIR,
+)
 from utils.misc import calculate_sha256
 
 log = logging.getLogger(__name__)
@@ -73,6 +79,12 @@ async def check_url(request: Request, call_next):
 
     response = await call_next(request)
     return response
+
+
+@app.head("/")
+@app.get("/")
+async def get_status():
+    return {"status": True}
 
 
 @app.get("/urls")
@@ -266,7 +278,7 @@ async def pull_model(
                         if request_id in REQUEST_POOL:
                             yield chunk
                         else:
-                            print("User: canceled request")
+                            log.warning("User: canceled request")
                             break
                 finally:
                     if hasattr(r, "close"):
@@ -664,7 +676,7 @@ async def generate_completion(
         else:
             raise HTTPException(
                 status_code=400,
-                detail="error_detail",
+                detail=ERROR_MESSAGES.MODEL_NOT_FOUND(form_data.model),
             )
 
     url = app.state.OLLAMA_BASE_URLS[url_idx]
@@ -770,7 +782,11 @@ async def generate_chat_completion(
 
     r = None
 
-    log.debug("form_data.model_dump_json(exclude_none=True).encode(): {0} ".format(form_data.model_dump_json(exclude_none=True).encode()))
+    log.debug(
+        "form_data.model_dump_json(exclude_none=True).encode(): {0} ".format(
+            form_data.model_dump_json(exclude_none=True).encode()
+        )
+    )
 
     def get_request():
         nonlocal form_data
@@ -1019,6 +1035,14 @@ async def download_model(
     url_idx: Optional[int] = None,
 ):
 
+    allowed_hosts = ["https://huggingface.co/", "https://github.com/"]
+
+    if not any(form_data.url.startswith(host) for host in allowed_hosts):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file_url. Only URLs from allowed hosts are permitted.",
+        )
+
     if url_idx == None:
         url_idx = 0
     url = app.state.OLLAMA_BASE_URLS[url_idx]
@@ -1027,6 +1051,7 @@ async def download_model(
 
     if file_name:
         file_path = f"{UPLOAD_DIR}/{file_name}"
+
         return StreamingResponse(
             download_file_stream(url, form_data.url, file_path, file_name),
         )
