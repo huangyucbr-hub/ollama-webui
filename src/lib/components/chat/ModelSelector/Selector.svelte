@@ -25,7 +25,7 @@
 
 	export let items = [{ value: 'mango', label: 'Mango' }];
 
-	export let className = 'max-w-lg';
+	export let className = ' w-[32rem]';
 
 	let show = false;
 
@@ -202,7 +202,7 @@
 		</div>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content
-		class=" z-40 w-full {className} justify-start rounded-lg  bg-white dark:bg-gray-900 dark:text-white shadow-lg border border-gray-300/30 dark:border-gray-700/50  outline-none "
+		class=" z-40 {className} max-w-[calc(100vw-1rem)] justify-start rounded-lg  bg-white dark:bg-gray-900 dark:text-white shadow-lg border border-gray-300/30 dark:border-gray-700/50  outline-none "
 		transition={flyAndScale}
 		side={'bottom-start'}
 		sideOffset={4}
@@ -227,7 +227,8 @@
 			<div class="px-3 my-2 max-h-72 overflow-y-auto scrollbar-none">
 				{#each filteredItems as item}
 					<button
-						class="flex w-full font-medium line-clamp-1 select-none items-center rounded-button py-2 pl-3 pr-1.5 text-sm text-gray-700 dark:text-gray-100 outline-none transition-all duration-75 hover:bg-gray-100 dark:hover:bg-gray-850 rounded-lg cursor-pointer data-[highlighted]:bg-muted"
+						aria-label="model-item"
+						class="flex w-full text-left font-medium line-clamp-1 select-none items-center rounded-button py-2 pl-3 pr-1.5 text-sm text-gray-700 dark:text-gray-100 outline-none transition-all duration-75 hover:bg-gray-100 dark:hover:bg-gray-850 rounded-lg cursor-pointer data-[highlighted]:bg-muted"
 						on:click={() => {
 							value = item.value;
 
@@ -397,6 +398,9 @@
 					</div>
 				{/each}
 			</div>
+
+			<div class="hidden w-[42rem]" />
+			<div class="hidden w-[32rem]" />
 		</slot>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
